@@ -240,15 +240,36 @@ const styleProfiles: Record<StyleType, StyleProfile> = {
   },
 };
 
-const pick = (items: readonly string[], seed: number): string => items[((seed % items.length) + items.length) % items.length];
+const pick = (items: readonly string[], seed: number): string => items[seed % items.length];
+
+const CONTRAST_CAP = 8;
+const ACCENT_CONTRAST_CAP = 6;
+const STONE_MATERIAL_KEYWORD = "stone";
+const MATERIAL_BONUS_POINTS = 5;
+const MIN_CONFIDENCE = 65;
+const MAX_CONFIDENCE = 99;
+const CONTRAST_WEIGHT = 0.65;
+const ACCENT_WEIGHT = 0.35;
 
 const scoreScenario = (scenario: Omit<DesignScenario, "confidence">): number => {
   const contrast = contrastRatio(scenario.wallColor, scenario.furnitureColor);
   const accentContrast = contrastRatio(scenario.wallColor, scenario.accentColor);
-  const contrastScore = Math.min(100, Math.round((Math.min(contrast, 8) / 8) * 100));
-  const accentScore = Math.min(100, Math.round((Math.min(accentContrast, 6) / 6) * 100));
-  const materialBonus = scenario.summary.toLowerCase().includes("stone") ? 5 : 0;
-  return Math.max(65, Math.min(99, Math.round(contrastScore * 0.65 + accentScore * 0.35 + materialBonus)));
+  const contrastScore = Math.min(100, Math.round((Math.min(contrast, CONTRAST_CAP) / CONTRAST_CAP) * 100));
+  const accentScore = Math.min(
+    100,
+    Math.round((Math.min(accentContrast, ACCENT_CONTRAST_CAP) / ACCENT_CONTRAST_CAP) * 100),
+  );
+  const materialBonus = scenario.summary.toLowerCase().includes(STONE_MATERIAL_KEYWORD)
+    ? MATERIAL_BONUS_POINTS
+    : 0;
+
+  return Math.max(
+    MIN_CONFIDENCE,
+    Math.min(
+      MAX_CONFIDENCE,
+      Math.round(contrastScore * CONTRAST_WEIGHT + accentScore * ACCENT_WEIGHT + materialBonus),
+    ),
+  );
 };
 
 export const designDataset: DesignScenario[] = rooms.flatMap((room, roomIndex) =>
