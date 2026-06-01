@@ -28,7 +28,7 @@ const startingPalette: PaletteInput = {
   primary: "#1D4ED8",
   secondary: "#0F172A",
   accent: "#22D3EE",
-  context: "SaaS Dashboard",
+  context: "Bedroom",
 };
 
 type ColorKey = "primary" | "secondary" | "accent";
@@ -123,18 +123,18 @@ export default function Home() {
 
         <section className="grid gap-4 rounded-3xl border border-white/15 bg-white/10 p-5 backdrop-blur-xl md:grid-cols-[2fr_1fr]">
           <div>
-            <p className="text-sm text-white/70">Environment / Use Case</p>
-            <input
-              list="context-options"
+            <p className="text-sm text-white/70">Select Place</p>
+            <select
               value={palette.context}
               onChange={(event) => setPalette((previous) => ({ ...previous, context: event.target.value }))}
               className="mt-2 h-11 w-full rounded-xl border border-white/20 bg-black/30 px-3 text-sm outline-none"
-            />
-            <datalist id="context-options">
+            >
               {knowledgeBase.contexts.map((context) => (
-                <option key={context} value={context} />
+                <option key={context} value={context}>
+                  {context}
+                </option>
               ))}
-            </datalist>
+            </select>
           </div>
           <div className="grid grid-cols-2 gap-2 md:grid-cols-1">
             <button className="rounded-xl bg-white/15 px-3 py-2 text-sm hover:bg-white/25" onClick={() => {
